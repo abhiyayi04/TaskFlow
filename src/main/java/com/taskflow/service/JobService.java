@@ -5,12 +5,14 @@ import com.taskflow.model.Job;
 import com.taskflow.model.JobStatus;
 import com.taskflow.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JobService {
@@ -24,7 +26,9 @@ public class JobService {
         job.setStatus(JobStatus.QUEUED);
         job.setScheduledAt(request.getScheduledAt());
         job.setMaxRetries(request.getMaxRetries());
-        return jobRepository.save(job);
+        Job saved = jobRepository.save(job);
+        log.info("Job submitted id={} type={} scheduledAt={}", saved.getId(), saved.getType(), saved.getScheduledAt());
+        return saved;
     }
 
     public Job getJob(String id) {
@@ -40,6 +44,7 @@ public class JobService {
         }
         job.setStatus(JobStatus.FAILED);
         jobRepository.save(job);
+        log.info("Job cancelled id={}", id);
     }
 
     public List<Job> listJobs(JobStatus status, String type) {

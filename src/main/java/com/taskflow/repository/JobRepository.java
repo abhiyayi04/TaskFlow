@@ -16,6 +16,11 @@ public interface JobRepository extends JpaRepository<Job, String> {
 
     List<Job> findByStatusAndType(JobStatus status, String type);
 
+    long countByStatus(JobStatus status);
+
+    @Query("SELECT COALESCE(SUM(j.retryCount), 0) FROM Job j")
+    long sumRetryCount();
+
     @Query(value = """
             SELECT * FROM jobs
             WHERE status = 'QUEUED'
